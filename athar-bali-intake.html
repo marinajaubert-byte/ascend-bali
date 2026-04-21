@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Bali Visit — Ascend Global</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #B8965A; --gold-light: #D4B07A; --gold-pale: #F5EDD8;
+    --ink: #1A1714; --ink-mid: #4A4540; --ink-soft: #8A8480;
+    --parchment: #FAF7F2; --white: #FFFFFF;
+    --border: rgba(184,150,90,0.25); --border-soft: rgba(184,150,90,0.12);
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--parchment); color: var(--ink); font-weight: 300; }
+  .hero { background: var(--ink); padding: 64px 32px 56px; text-align: center; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(184,150,90,0.15) 0%, transparent 70%); pointer-events: none; }
+  .hero-eyebrow { font-size: 11px; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 18px; }
+  .hero h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(34px, 5vw, 52px); font-weight: 300; color: #fff; line-height: 1.1; margin-bottom: 16px; }
+  .hero h1 em { font-style: italic; color: var(--gold-light); }
+  .hero-sub { font-size: 14px; color: rgba(255,255,255,0.5); max-width: 480px; margin: 0 auto; line-height: 1.7; }
+  .gold-line { width: 48px; height: 1px; background: var(--gold); margin: 24px auto; opacity: 0.6; }
+  .container { max-width: 700px; margin: 0 auto; padding: 52px 24px 80px; }
+  .intro-text { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300; font-style: italic; color: var(--ink-mid); line-height: 1.7; margin-bottom: 40px; text-align: center; }
+  .section { margin-bottom: 48px; }
+  .section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 1px solid var(--border-soft); }
+  .section-num { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; color: var(--gold); line-height: 1; min-width: 26px; }
+  .section-title { font-size: 13px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mid); }
+  .field { margin-bottom: 20px; }
+  label { display: block; font-size: 13.5px; color: var(--ink-mid); margin-bottom: 7px; line-height: 1.5; font-weight: 400; }
+  label .hint { display: block; font-size: 12px; color: var(--ink-soft); margin-top: 2px; font-style: italic; }
+  input[type="text"], input[type="email"], input[type="url"], textarea, select {
+    width: 100%; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 300;
+    color: var(--ink); background: var(--white); border: 1px solid var(--border);
+    border-radius: 6px; padding: 11px 15px; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s; appearance: none;
+  }
+  input:focus, textarea:focus, select:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(184,150,90,0.1); }
+  input::placeholder, textarea::placeholder { color: var(--ink-soft); }
+  textarea { resize: vertical; min-height: 85px; line-height: 1.65; }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23B8965A' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; cursor: pointer; }
+  .choices { display: flex; flex-direction: column; gap: 7px; }
+  .choice { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; padding: 9px 13px; border: 1px solid var(--border-soft); border-radius: 6px; background: var(--white); transition: border-color 0.2s, background 0.2s; }
+  .choice:hover { border-color: var(--border); background: var(--gold-pale); }
+  .choice input { width: auto; accent-color: var(--gold); margin-top: 2px; flex-shrink: 0; cursor: pointer; }
+  .choice span { font-size: 13.5px; color: var(--ink-mid); line-height: 1.45; font-weight: 300; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 520px) { .field-row { grid-template-columns: 1fr; } }
+  .info-box { background: var(--gold-pale); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; font-size: 13px; color: var(--ink-mid); line-height: 1.65; }
+  .info-box strong { color: var(--gold); font-weight: 500; }
+  .submit-wrap { margin-top: 52px; text-align: center; border-top: 1px solid var(--border-soft); padding-top: 44px; }
+  .submit-note { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 300; font-style: italic; color: var(--ink-soft); margin-bottom: 24px; line-height: 1.6; }
+  button[type="submit"] { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--white); background: var(--ink); border: none; border-radius: 4px; padding: 15px 40px; cursor: pointer; transition: background 0.25s, transform 0.15s; }
+  button[type="submit"]:hover { background: var(--gold); transform: translateY(-1px); }
+  .thankyou { display: none; text-align: center; padding: 60px 24px; }
+  .thankyou.active { display: block; }
+  .thankyou h2 { font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 300; font-style: italic; color: var(--ink); margin-bottom: 14px; }
+  .thankyou p { font-size: 14px; color: var(--ink-soft); line-height: 1.7; }
+  .footer { text-align: center; padding: 24px; font-size: 12px; color: var(--ink-soft); letter-spacing: 0.08em; }
+  .footer strong { color: var(--gold); font-weight: 400; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <p class="hero-eyebrow">Ascend Global · Bali</p>
+  <h1>Let's make your<br><em>Bali visit count.</em></h1>
+  <div class="gold-line"></div>
+  <p class="hero-sub">Tell us what you need and Marina will come back to you within 24 hours with the right connections, rooms and opportunities for your time in Bali.</p>
+</div>
+
+<div class="container">
+  <p class="intro-text">"The right introduction in the right city can open a market you have been trying to crack for years."</p>
+
+  <form id="intakeForm">
+
+    <!-- 1. About You -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">01</span><span class="section-title">About you & your business</span></div>
+      <div class="field-row">
+        <div class="field"><label>Full name</label><input type="text" name="name" placeholder="Your name" required></div>
+        <div class="field"><label>WhatsApp number</label><input type="text" name="whatsapp" placeholder="+65..."></div>
+      </div>
+      <div class="field"><label>Email address</label><input type="email" name="email" placeholder="your@email.com"></div>
+      <div class="field"><label>Company name</label><input type="text" name="company" placeholder="e.g. SMC Solutions"></div>
+      <div class="field"><label>Your website(s)<span class="hint">Share all relevant links including regional sites</span></label><textarea name="websites" placeholder="e.g. smcse.com, smcseconsulting.com, silverline.host"></textarea></div>
+      <div class="field"><label>Describe what your business does and who it serves<span class="hint">Be specific — this is how Marina introduces you to the right people</span></label><textarea name="business_description" placeholder="e.g. We provide digital transformation solutions including web development, IT consultancy, technical marketing and data modelling for businesses globally..."></textarea></div>
+      <div class="field"><label>Where are you currently operating? Select all that apply.</label>
+        <div class="choices">
+          <label class="choice"><input type="checkbox" name="markets" value="usa"> <span>United States</span></label>
+          <label class="choice"><input type="checkbox" name="markets" value="singapore"> <span>Singapore</span></label>
+          <label class="choice"><input type="checkbox" name="markets" value="pakistan"> <span>Pakistan</span></label>
+          <label class="choice"><input type="checkbox" name="markets" value="indonesia"> <span>Indonesia (expanding)</span></label>
+          <label class="choice"><input type="checkbox" name="markets" value="other"> <span>Other markets — I will list below</span></label>
+        </div>
+      </div>
+      <div class="field"><label>Any other markets? List them here *(optional)*</label><input type="text" name="other_markets" placeholder="e.g. UAE, Australia, UK..."></div>
+    </div>
+
+    <!-- 2. Your Bali Visit -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">02</span><span class="section-title">Your Bali visit</span></div>
+      <div class="info-box"><strong>New to Bali's business scene?</strong> Ascend Global gives you direct access to the founder, investor and entrepreneur communities that most visitors never find — even after multiple trips.</div>
+      <div class="field-row">
+        <div class="field"><label>Arriving in Bali</label><input type="text" name="arrival" placeholder="e.g. May 12, 2026"></div>
+        <div class="field"><label>Leaving Bali</label><input type="text" name="departure" placeholder="e.g. May 18, 2026"></div>
+      </div>
+      <div class="field"><label>Have you visited Bali before?</label>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="bali_before" value="yes"> <span>Yes, I know Bali well</span></label>
+          <label class="choice"><input type="radio" name="bali_before" value="few"> <span>A couple of times but I don't know the business scene</span></label>
+          <label class="choice"><input type="radio" name="bali_before" value="no"> <span>First time — I need guidance on everything</span></label>
+        </div>
+      </div>
+      <div class="field"><label>Do you have a valid visa for conducting business in Indonesia?<span class="hint">Running meetings, investor conversations or business activities requires the right visa. Marina can advise.</span></label>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="visa" value="yes"> <span>Yes, I have the right visa sorted</span></label>
+          <label class="choice"><input type="radio" name="visa" value="tourist"> <span>Coming on a tourist visa — not sure if that covers business activities</span></label>
+          <label class="choice"><input type="radio" name="visa" value="no"> <span>No — I need advice on this</span></label>
+          <label class="choice"><input type="radio" name="visa" value="unsure"> <span>Not sure — would appreciate guidance</span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Who You Want to Meet -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">03</span><span class="section-title">Who you want to meet</span></div>
+      <div class="field"><label>What type of connections are you looking for in Bali? Select all that apply.</label>
+        <div class="choices">
+          <label class="choice"><input type="checkbox" name="connections" value="investors"> <span>Investors — angel, VC or real estate investors open to tech opportunities</span></label>
+          <label class="choice"><input type="checkbox" name="connections" value="clients"> <span>Clients — businesses that need digital transformation services</span></label>
+          <label class="choice"><input type="checkbox" name="connections" value="partners"> <span>Strategic partners and collaborators</span></label>
+          <label class="choice"><input type="checkbox" name="connections" value="distributors"> <span>Local distributors or resellers for our products</span></label>
+          <label class="choice"><input type="checkbox" name="connections" value="founders"> <span>Founders and entrepreneurs to exchange ideas with</span></label>
+          <label class="choice"><input type="checkbox" name="connections" value="government"> <span>Government or regulatory contacts for Indonesia market entry</span></label>
+          <label class="choice"><input type="checkbox" name="connections" value="tech"> <span>Tech and AI community in Bali</span></label>
+          <label class="choice"><input type="checkbox" name="connections" value="expats"> <span>Expat business community in Bali</span></label>
+        </div>
+      </div>
+      <div class="field"><label>Describe your ideal connection or introduction in Bali<span class="hint">Industry, business size, decision-making level — the more specific, the better Marina can curate for you</span></label><textarea name="ideal_connection" placeholder="e.g. CEOs or CTOs of mid-size businesses in hospitality, retail or logistics who are looking to modernise their digital infrastructure..."></textarea></div>
+      <div class="field"><label>Do you have any existing contacts in Bali you would like us to help you reconnect with or build on?</label><textarea name="existing_contacts" placeholder="Optional — names, companies or industries"></textarea></div>
+      <div class="field"><label>What is one introduction that would make this entire trip worthwhile?</label><input type="text" name="dream_intro" placeholder="e.g. A Series A investor who understands SaaS, or a hotel group looking for a tech partner..."></textarea></div>
+    </div>
+
+    <!-- 4. Your Offer & Products -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">04</span><span class="section-title">Your offer & products</span></div>
+      <div class="field"><label>What are your core services or products?<span class="hint">List them so Marina knows exactly what to position when making introductions</span></label><textarea name="services" placeholder="e.g. Web development, store development, IT consultancy, technical marketing, data modelling, Silverline hosting platform..."></textarea></div>
+      <div class="field"><label>Do you have a product or platform you are actively seeking investment for?</label>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="seeking_investment" value="yes"> <span>Yes — I will describe it below</span></label>
+          <label class="choice"><input type="radio" name="seeking_investment" value="no"> <span>No, not at this stage</span></label>
+          <label class="choice"><input type="radio" name="seeking_investment" value="maybe"> <span>Open to conversations if the right investor comes along</span></label>
+        </div>
+      </div>
+      <div class="field"><label>If yes, describe the product and what you are looking for from investors<span class="hint">Stage, amount, what the investment will be used for</span></label><textarea name="investment_details" placeholder="e.g. Silverline.host is a hosting platform currently at pre-seed stage. We are looking for USD $500K to accelerate product development and sales..."></textarea></div>
+      <div class="field"><label>What is one client or partnership worth to your business?<span class="hint">This helps Marina understand the ROI of connecting you with the right people</span></label><input type="text" name="client_value" placeholder="e.g. A single enterprise client is worth $50K per year in retainer..."></div>
+    </div>
+
+    <!-- 5. Support You Need -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">05</span><span class="section-title">How Ascend Global can help</span></div>
+      <div class="field"><label>What support do you need during your Bali visit? Select all that apply.</label>
+        <div class="choices">
+          <label class="choice"><input type="checkbox" name="support" value="introductions"> <span>Curated investor and partner introductions from Marina's network</span></label>
+          <label class="choice"><input type="checkbox" name="support" value="dinner"> <span>Private dinner or event to meet multiple connections in one room</span></label>
+          <label class="choice"><input type="checkbox" name="support" value="community"> <span>Access to Bali's founder and entrepreneur communities</span></label>
+          <label class="choice"><input type="checkbox" name="support" value="promo"> <span>Promotion of your business across Bali entrepreneur networks</span></label>
+          <label class="choice"><input type="checkbox" name="support" value="market_entry"> <span>Indonesia market entry guidance and local business connections</span></label>
+          <label class="choice"><input type="checkbox" name="support" value="venue"> <span>Venue and restaurant recommendations for client meetings</span></label>
+          <label class="choice"><input type="checkbox" name="support" value="visa"> <span>Visa and legal guidance for business activities in Indonesia</span></label>
+          <label class="choice"><input type="checkbox" name="support" value="accommodation"> <span>Accommodation recommendations</span></label>
+          <label class="choice"><input type="checkbox" name="support" value="concierge"> <span>Full concierge support — I want someone on the ground handling logistics</span></label>
+        </div>
+      </div>
+      <div class="field"><label>What is the biggest challenge you are facing in making this Bali visit productive?</label><textarea name="challenge" placeholder="e.g. I don't know the right people, I have a short window of time, I am not sure which communities to tap into..."></textarea></div>
+      <div class="field"><label>How many meetings or introductions would make this trip a success?</label>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="meetings_goal" value="1-3"> <span>1 to 3 high quality meetings</span></label>
+          <label class="choice"><input type="radio" name="meetings_goal" value="5-10"> <span>5 to 10 targeted introductions</span></label>
+          <label class="choice"><input type="radio" name="meetings_goal" value="event"> <span>One well-curated event where I meet multiple people at once</span></label>
+          <label class="choice"><input type="radio" name="meetings_goal" value="all"> <span>As many as possible — I want to maximise every day</span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Goals & Vision -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">06</span><span class="section-title">Your goals in Indonesia</span></div>
+      <div class="field"><label>What does success in the Indonesian market look like for you in the next 12 months?</label><textarea name="indonesia_goals" placeholder="e.g. 3 to 5 enterprise clients in hospitality or retail, a local partner who can help us sell and deliver, one investor for Silverline..."></textarea></div>
+      <div class="field"><label>Are you planning to return to Bali or Indonesia after this visit?</label>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="return" value="yes"> <span>Yes — I plan to come back regularly</span></label>
+          <label class="choice"><input type="radio" name="return" value="maybe"> <span>Possibly — depends on how this visit goes</span></label>
+          <label class="choice"><input type="radio" name="return" value="no"> <span>This is a one-off exploratory visit for now</span></label>
+        </div>
+      </div>
+      <div class="field"><label>Would you be interested in being featured or speaking at a Bali founder event to raise your profile in this market?</label>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="speaking" value="yes"> <span>Yes — I would love that</span></label>
+          <label class="choice"><input type="radio" name="speaking" value="maybe"> <span>Open to it if the audience is right</span></label>
+          <label class="choice"><input type="radio" name="speaking" value="no"> <span>No — I prefer to keep a lower profile</span></label>
+        </div>
+      </div>
+      <div class="field"><label>Anything else you want Marina to know before she starts building your Bali plan?</label><textarea name="anything_else" placeholder="Open space — share freely..."></textarea></div>
+    </div>
+
+    <div class="submit-wrap">
+      <p class="submit-note">"The right room in Bali<br>can open an entire market."</p>
+      <button type="submit">Submit my brief →</button>
+    </div>
+  </form>
+
+  <div class="thankyou" id="thankyou">
+    <div class="gold-line"></div>
+    <h2>Thank you, Athar.</h2>
+    <p>Marina has your brief and will be in touch within 24 hours<br>with a tailored plan for your Bali visit in May.</p>
+    <div class="gold-line"></div>
+  </div>
+</div>
+
+<div class="footer"><strong>Ascend Global</strong> &nbsp;·&nbsp; Marina &nbsp;·&nbsp; Bali</div>
+
+<script>
+  document.getElementById('intakeForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    this.style.display = 'none';
+    document.getElementById('thankyou').classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
+</body>
+</html>
