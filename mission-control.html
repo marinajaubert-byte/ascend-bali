@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mission Control — Ascend Global</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #B8965A; --gold-light: #D4B07A; --gold-pale: #F5EDD8;
+    --ink: #1A1714; --ink-mid: #4A4540; --ink-soft: #8A8480;
+    --parchment: #FAF7F2; --white: #FFFFFF;
+    --border: rgba(184,150,90,0.25); --border-soft: rgba(184,150,90,0.12);
+    --green: #4A7C59; --green-pale: #EBF2EE;
+    --amber: #B8813A; --amber-pale: #FDF3E7;
+    --red: #8B3A3A; --red-pale: #FAF0F0;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--parchment); color: var(--ink); font-weight: 300; }
+
+  /* ─── HERO ─── */
+  .hero { background: var(--ink); padding: 56px 32px 48px; text-align: center; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(184,150,90,0.15) 0%, transparent 70%); pointer-events: none; }
+  .hero-eyebrow { font-size: 11px; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+  .hero h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(32px, 5vw, 48px); font-weight: 300; color: #fff; line-height: 1.1; margin-bottom: 10px; }
+  .hero h1 em { font-style: italic; color: var(--gold-light); }
+  .hero-date { font-size: 12px; color: rgba(255,255,255,0.4); letter-spacing: 0.12em; margin-top: 10px; }
+  .gold-line { width: 48px; height: 1px; background: var(--gold); margin: 20px auto; opacity: 0.6; }
+
+  /* ─── LAYOUT ─── */
+  .container { max-width: 780px; margin: 0 auto; padding: 48px 24px 80px; }
+  .intro-text { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 300; font-style: italic; color: var(--ink-mid); line-height: 1.7; margin-bottom: 44px; text-align: center; }
+
+  /* ─── PROGRESS BAR ─── */
+  .progress-bar-wrap { background: var(--white); border: 1px solid var(--border-soft); border-radius: 8px; padding: 18px 22px; margin-bottom: 44px; }
+  .progress-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .progress-label span { font-size: 12px; color: var(--ink-soft); letter-spacing: 0.08em; text-transform: uppercase; }
+  .progress-label strong { font-size: 13px; color: var(--gold); font-weight: 500; }
+  .bar-track { height: 4px; background: var(--border-soft); border-radius: 2px; overflow: hidden; }
+  .bar-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light)); border-radius: 2px; transition: width 0.4s ease; }
+
+  /* ─── CATEGORY ─── */
+  .category { margin-bottom: 44px; }
+  .category-header { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; padding-bottom: 13px; border-bottom: 1px solid var(--border-soft); }
+  .cat-icon { font-size: 18px; line-height: 1; }
+  .cat-title { font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-mid); }
+  .cat-count { margin-left: auto; font-size: 11px; color: var(--ink-soft); letter-spacing: 0.06em; }
+
+  /* ─── TASK CARD ─── */
+  .task { background: var(--white); border: 1px solid var(--border-soft); border-radius: 8px; padding: 16px 18px; margin-bottom: 10px; display: flex; gap: 14px; align-items: flex-start; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s; }
+  .task:hover { border-color: var(--border); box-shadow: 0 2px 8px rgba(184,150,90,0.08); }
+  .task.done { opacity: 0.55; }
+  .task.done .task-title { text-decoration: line-through; color: var(--ink-soft); }
+  .task-check { width: 18px; height: 18px; border: 1.5px solid var(--border); border-radius: 4px; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: background 0.2s, border-color 0.2s; }
+  .task.done .task-check { background: var(--green); border-color: var(--green); }
+  .task-check svg { display: none; }
+  .task.done .task-check svg { display: block; }
+  .task-body { flex: 1; }
+  .task-title { font-size: 14px; font-weight: 400; color: var(--ink); line-height: 1.45; margin-bottom: 4px; }
+  .task-detail { font-size: 12.5px; color: var(--ink-soft); line-height: 1.55; }
+  .task-badge { display: inline-block; font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 3px; padding: 2px 7px; margin-left: 8px; vertical-align: middle; }
+  .badge-urgent { background: var(--red-pale); color: var(--red); }
+  .badge-revenue { background: var(--green-pale); color: var(--green); }
+  .badge-soon { background: var(--amber-pale); color: var(--amber); }
+  .badge-date { background: var(--gold-pale); color: var(--gold); border: 1px solid var(--border-soft); }
+
+  /* ─── SUB-TASKS ─── */
+  .sub-tasks { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-soft); display: flex; flex-direction: column; gap: 7px; }
+  .sub-task { display: flex; align-items: flex-start; gap: 9px; cursor: pointer; }
+  .sub-check { width: 14px; height: 14px; border: 1px solid var(--border); border-radius: 3px; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: background 0.2s, border-color 0.2s; }
+  .sub-task.done .sub-check { background: var(--green); border-color: var(--green); }
+  .sub-task.done .sub-check svg { display: block; }
+  .sub-check svg { display: none; }
+  .sub-label { font-size: 12.5px; color: var(--ink-mid); line-height: 1.45; }
+  .sub-task.done .sub-label { text-decoration: line-through; color: var(--ink-soft); }
+
+  /* ─── FOOTER ─── */
+  .footer { text-align: center; padding: 24px; font-size: 12px; color: var(--ink-soft); letter-spacing: 0.08em; }
+  .footer strong { color: var(--gold); font-weight: 400; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <p class="hero-eyebrow">Ascend Global · Mission Control</p>
+  <h1><em>May 2026</em><br>Command Centre</h1>
+  <div class="gold-line"></div>
+  <p class="hero-date">Week of 4 May — target month-end close</p>
+</div>
+
+<div class="container">
+
+  <p class="intro-text">"One focused month, executed with precision,<br>is worth a year of scattered momentum."</p>
+
+  <!-- PROGRESS -->
+  <div class="progress-bar-wrap">
+    <div class="progress-label">
+      <span>Overall progress</span>
+      <strong id="progress-pct">0 of 0 complete</strong>
+    </div>
+    <div class="bar-track"><div class="bar-fill" id="bar-fill" style="width:0%"></div></div>
+  </div>
+
+  <!-- ── 1. WEBSITE & OFFERS ── -->
+  <div class="category">
+    <div class="category-header">
+      <span class="cat-icon">🌐</span>
+      <span class="cat-title">Website, Strategy & Offers</span>
+      <span class="cat-count" id="count-1"></span>
+    </div>
+
+    <div class="task" data-cat="1">
+      <div class="task-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-title">Finalise website copy & positioning<span class="task-badge badge-urgent">Priority</span></div>
+        <div class="task-detail">Rewrite key sections to reflect current strategy — clear offer language, who you help, and how.</div>
+        <div class="sub-tasks">
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Update hero headline & sub-copy</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Rewrite services/offers section to reflect finalised strategy</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Add clear booking CTA — what do people book you for?</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="task" data-cat="1">
+      <div class="task-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-title">Finalise strategy & offers document<span class="task-badge badge-urgent">Priority</span></div>
+        <div class="task-detail">Lock in your core offers, pricing tiers, and positioning before launching anything else.</div>
+      </div>
+    </div>
+
+    <div class="task" data-cat="1">
+      <div class="task-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-title">Create waitlist for membership<span class="task-badge badge-revenue">Revenue</span></div>
+        <div class="task-detail">Build and embed a waitlist sign-up so interested people can raise their hand before you open doors.</div>
+        <div class="sub-tasks">
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Decide membership name and pitch sentence</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Set up waitlist form (Typeform, ConvertKit, or landing page)</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Embed or link from website</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. EVENT ── -->
+  <div class="category">
+    <div class="category-header">
+      <span class="cat-icon">🎟</span>
+      <span class="cat-title">New Event — Meg Tickets</span>
+      <span class="cat-count" id="count-2"></span>
+    </div>
+
+    <div class="task" data-cat="2">
+      <div class="task-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-title">Finalise event concept & name<span class="task-badge badge-soon">This week</span></div>
+        <div class="task-detail">Lock in what this event is — theme, format, audience — so everything else can be built around it.</div>
+      </div>
+    </div>
+
+    <div class="task" data-cat="2">
+      <div class="task-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-title">Confirm date: Monday 18 May<span class="task-badge badge-date">18 May</span></div>
+        <div class="task-detail">Date is provisionally set. Confirm venue, capacity, and ticket price before going live on Meg Tickets.</div>
+        <div class="sub-tasks">
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Confirm venue availability for 18 May</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Set ticket price and capacity</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Create and publish Meg Tickets listing</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="task" data-cat="2">
+      <div class="task-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-title">Create Canva graphics for event</div>
+        <div class="task-detail">Design event promo assets: story, square post, and event cover banner.</div>
+        <div class="sub-tasks">
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Instagram Story (1080×1920)</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Square post / feed graphic (1080×1080)</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Event cover / banner</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. CLAUDE COACH SKILL SET ── -->
+  <div class="category">
+    <div class="category-header">
+      <span class="cat-icon">🤖</span>
+      <span class="cat-title">Claude Coach Skill Set</span>
+      <span class="cat-count" id="count-3"></span>
+    </div>
+
+    <div class="task" data-cat="3">
+      <div class="task-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-title">Extract new skill set from email<span class="task-badge badge-soon">Action needed</span></div>
+        <div class="task-detail">Retrieve and document your new Claude Coach skill set details from your email inbox.</div>
+      </div>
+    </div>
+
+    <div class="task" data-cat="3">
+      <div class="task-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-title">Create Canva graphics for Claude Coach</div>
+        <div class="task-detail">Design promo and content assets to launch or promote the Claude Coach skill set offering.</div>
+        <div class="sub-tasks">
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Canva extraction / asset export</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Promo graphic for Instagram / LinkedIn</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 4. DM AUTOMATION ── -->
+  <div class="category">
+    <div class="category-header">
+      <span class="cat-icon">💬</span>
+      <span class="cat-title">LinkedIn DM Outreach Automation</span>
+      <span class="cat-count" id="count-4"></span>
+    </div>
+
+    <div class="task" data-cat="4">
+      <div class="task-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-title">Set up LinkedIn DM automation<span class="task-badge badge-revenue">Revenue</span></div>
+        <div class="task-detail">Build outreach sequences to attract and qualify new leads — founders, clients, and collaborators.</div>
+        <div class="sub-tasks">
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Choose tool (e.g. Expandi, Lemlist, or native LinkedIn)</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Write outreach message sequences (connection request + follow-ups)</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Define target audience filters</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Launch first campaign</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 5. AI AVATAR ── -->
+  <div class="category">
+    <div class="category-header">
+      <span class="cat-icon">🎭</span>
+      <span class="cat-title">AI Avatar — HeyGen</span>
+      <span class="cat-count" id="count-5"></span>
+    </div>
+
+    <div class="task" data-cat="5">
+      <div class="task-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-title">Create AI avatar with HeyGen<span class="task-badge badge-soon">This month</span></div>
+        <div class="task-detail">Record or upload your training footage to HeyGen and create your personalised AI video avatar.</div>
+        <div class="sub-tasks">
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Record training video (5+ min, good lighting, neutral background)</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Upload to HeyGen and create avatar</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Generate first test video and review quality</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Plan use cases (content, onboarding, outreach videos)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 6. REVENUE GOAL ── -->
+  <div class="category">
+    <div class="category-header">
+      <span class="cat-icon">💰</span>
+      <span class="cat-title">$5,000 Revenue Target — This Month</span>
+      <span class="cat-count" id="count-6"></span>
+    </div>
+
+    <div class="task" data-cat="6">
+      <div class="task-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-title">Create passive income offer<span class="task-badge badge-revenue">$$ Target</span></div>
+        <div class="task-detail">Design a low-effort recurring revenue product — templates, course, community access, or digital asset.</div>
+        <div class="sub-tasks">
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Choose format (course / template pack / community)</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Set price point and delivery method</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Build out and make purchasable</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="task" data-cat="6">
+      <div class="task-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-title">Create second offer — Events or AI Strategy<span class="task-badge badge-revenue">$5K Goal</span></div>
+        <div class="task-detail">Design a done-for-you or advisory offer in Events or AI Strategy that can close $5K this month.</div>
+        <div class="sub-tasks">
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Decide: Events offer vs AI Strategy advisory vs both</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Write one-page offer description and price</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Pitch to 5 warm leads this week</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 7. PODCAST ── -->
+  <div class="category">
+    <div class="category-header">
+      <span class="cat-icon">🎙</span>
+      <span class="cat-title">Podcast Launch</span>
+      <span class="cat-count" id="count-7"></span>
+    </div>
+
+    <div class="task" data-cat="7">
+      <div class="task-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-title">Descript video editing session (2+ hours)<span class="task-badge badge-soon">Block time</span></div>
+        <div class="task-detail">Schedule a focused 2-hour block to edit your podcast episodes in Descript — captions, cuts, and descriptions done.</div>
+        <div class="sub-tasks">
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Block 2-hour editing window in calendar</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Edit and clean up episode audio/video in Descript</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Write episode descriptions and titles</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Export and upload finished episodes</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="task" data-cat="7">
+      <div class="task-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-title">Define your podcast booking offer<span class="task-badge badge-urgent">Clarity needed</span></div>
+        <div class="task-detail">Answer the question: when someone lands on your page after hearing the podcast, what do they book you for? Lock in one clear CTA.</div>
+        <div class="sub-tasks">
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Decide primary CTA (strategy call / VIP day / course / event)</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Write the landing page offer section</span></div>
+          <div class="sub-task"><div class="sub-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="sub-label">Add booking link (Calendly, Acuity, or similar)</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="task" data-cat="7">
+      <div class="task-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-title">Launch podcast</div>
+        <div class="task-detail">Go live — publish episodes, announce on social, and drive traffic to the booking CTA.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer"><strong>Ascend Global</strong> &nbsp;·&nbsp; Marina &nbsp;·&nbsp; Mission Control · May 2026</div>
+
+<script>
+  const CHECK_SVG = `<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const SUBCHECK_SVG = `<svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+  function saveState() {
+    const tasks = [...document.querySelectorAll('.task')].map(t => t.classList.contains('done'));
+    const subs = [...document.querySelectorAll('.sub-task')].map(s => s.classList.contains('done'));
+    localStorage.setItem('mc_tasks', JSON.stringify(tasks));
+    localStorage.setItem('mc_subs', JSON.stringify(subs));
+  }
+
+  function loadState() {
+    const tasks = JSON.parse(localStorage.getItem('mc_tasks') || '[]');
+    const subs = JSON.parse(localStorage.getItem('mc_subs') || '[]');
+    document.querySelectorAll('.task').forEach((t, i) => { if (tasks[i]) t.classList.add('done'); });
+    document.querySelectorAll('.sub-task').forEach((s, i) => { if (subs[i]) s.classList.add('done'); });
+  }
+
+  function updateProgress() {
+    const tasks = document.querySelectorAll('.task');
+    const done = document.querySelectorAll('.task.done');
+    const pct = tasks.length ? Math.round((done.length / tasks.length) * 100) : 0;
+    document.getElementById('progress-pct').textContent = `${done.length} of ${tasks.length} complete`;
+    document.getElementById('bar-fill').style.width = pct + '%';
+
+    // per-category counts
+    for (let i = 1; i <= 7; i++) {
+      const catTasks = document.querySelectorAll(`.task[data-cat="${i}"]`);
+      const catDone = [...catTasks].filter(t => t.classList.contains('done'));
+      const el = document.getElementById(`count-${i}`);
+      if (el) el.textContent = `${catDone.length} / ${catTasks.length}`;
+    }
+  }
+
+  document.querySelectorAll('.task').forEach(task => {
+    task.addEventListener('click', e => {
+      if (e.target.closest('.sub-task')) return;
+      task.classList.toggle('done');
+      saveState(); updateProgress();
+    });
+  });
+
+  document.querySelectorAll('.sub-task').forEach(sub => {
+    sub.addEventListener('click', e => {
+      e.stopPropagation();
+      sub.classList.toggle('done');
+      saveState(); updateProgress();
+    });
+  });
+
+  loadState();
+  updateProgress();
+</script>
+</body>
+</html>
