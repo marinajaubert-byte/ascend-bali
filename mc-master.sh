@@ -6,6 +6,7 @@
 #    bash mc-master.sh
 #
 #  Requires only: bash · node 18+ · npm · python3
+#  Auto-detects app/ or src/app/, SQLite or JSON storage.
 # ================================================================
 set -e
 
@@ -17,6 +18,7 @@ ok()  { echo -e "${G}  ✓ $*${B}"; }
 hdr() { echo -e "\n${Y}── $* ${B}"; }
 err() { echo -e "\033[0;31m  ✗ $*${B}"; exit 1; }
 warn(){ echo -e "${Y}  ⚠  $*${B}"; }
+info(){ echo -e "  $*"; }
 
 echo ""
 echo -e "${Y}  ✦ Mission Control — Full Install${B}"
@@ -24,13 +26,23 @@ echo "  ════════════════════════
 
 # 1. Checks
 hdr "1. Checks"
-[ -d "$MC" ]         || err "Not found: $MC  |  Set: MC_DIR=/your/path bash mc-master.sh"
-[ -d "$MC/src/app" ] || err "No src/app in $MC — wrong folder?"
+[ -d "$MC" ] || err "Not found: $MC  |  Set: MC_DIR=/your/path bash mc-master.sh"
 command -v node    >/dev/null || err "node not found — install Node.js 18+"
 command -v python3 >/dev/null || err "python3 not found"
-ok "Mission Control at $MC"
 
-SRC="$MC/src/app"
+# Auto-detect app directory — use MC_APP_DIR if set by deploy.sh, else probe
+if [ -n "${MC_APP_DIR}" ]; then
+  SRC="${MC_APP_DIR}"
+elif [ -d "$MC/src/app" ]; then
+  SRC="$MC/src/app"
+elif [ -d "$MC/app" ]; then
+  SRC="$MC/app"
+else
+  err "Cannot find Next.js app directory in $MC (checked app/ and src/app/)"
+fi
+
+ok "Mission Control at $MC"
+ok "App directory:   $SRC"
 
 # 2. Backup
 hdr "2. Backup"
@@ -80,12 +92,18 @@ for RC in "$HOME/.zshrc" "$HOME/.bashrc"; do
 done
 ok "mc installed — try: mc today"
 
-# 5. Database migration
+# 5. Database migration (only if crm.db exists — skipped for JSON-based apps)
 hdr "5. Database migration"
-python3 "$MCLI/_migrate.py" "$MC"
-ok "Database ready"
+DB_PATH=$(find "$MC" -maxdepth 3 -name "crm.db" 2>/dev/null | grep -v sample | head -1 || true)
+if [ -n "$DB_PATH" ]; then
+  python3 "$MCLI/_migrate.py" "$MC"
+  ok "Database migrated"
+else
+  info "No crm.db found — app uses JSON storage, skipping SQLite migration"
+  ok "Skipped (not needed)"
+fi
 
-# 6. App/s pages
+# 6. Pages → /app/s
 hdr "6. Pages"
 mkdir -p "$SRC/s/dashboard" "$SRC/s/today" "$SRC/s/tasks" \
           "$SRC/s/goals"    "$SRC/s/brain-dump" "$SRC/s/inbox"
@@ -95,27 +113,35 @@ cp "$MCLI/s-tasks.tsx"      "$SRC/s/tasks/page.tsx"
 cp "$MCLI/s-goals.tsx"      "$SRC/s/goals/page.tsx"
 cp "$MCLI/s-brain-dump.tsx" "$SRC/s/brain-dump/page.tsx"
 cp "$MCLI/s-inbox.tsx"      "$SRC/s/inbox/page.tsx"
-ok "Pages written"
+ok "Pages written to $SRC/s/"
 
-# 7. API routes
+# 7. API routes (only write if they don't already exist)
 hdr "7. API routes"
-mkdir -p "$SRC/api/goals/[id]" "$SRC/api/brain-dump/[id]" \
-          "$SRC/api/inbox/[id]"  "$SRC/api/today"
-cp "$MCLI/goals-collection.ts"      "$SRC/api/goals/route.ts"
-cp "$MCLI/goals-id.ts"              "$SRC/api/goals/[id]/route.ts"
-cp "$MCLI/brain-dump-collection.ts" "$SRC/api/brain-dump/route.ts"
-cp "$MCLI/brain-dump-id.ts"         "$SRC/api/brain-dump/[id]/route.ts"
-cp "$MCLI/inbox-collection.ts"      "$SRC/api/inbox/route.ts"
-cp "$MCLI/inbox-id.ts"              "$SRC/api/inbox/[id]/route.ts"
-cp "$MCLI/today.ts"                 "$SRC/api/today/route.ts"
-ok "API routes written"
+write_route() {
+  local dest="$1" src="$2"
+  if [ -f "$dest" ]; then
+    info "exists — skipping $dest"
+  else
+    mkdir -p "$(dirname "$dest")"
+    cp "$src" "$dest"
+    info "wrote $dest"
+  fi
+}
+write_route "$SRC/api/goals/route.ts"             "$MCLI/goals-collection.ts"
+write_route "$SRC/api/goals/[id]/route.ts"        "$MCLI/goals-id.ts"
+write_route "$SRC/api/brain-dump/route.ts"        "$MCLI/brain-dump-collection.ts"
+write_route "$SRC/api/brain-dump/[id]/route.ts"   "$MCLI/brain-dump-id.ts"
+write_route "$SRC/api/inbox/route.ts"             "$MCLI/inbox-collection.ts"
+write_route "$SRC/api/inbox/[id]/route.ts"        "$MCLI/inbox-id.ts"
+write_route "$SRC/api/today/route.ts"             "$MCLI/today.ts"
+ok "API routes done"
 
 # 8. Type check
 hdr "8. Type check"
 cd "$MC"
 TSC=$(npx tsc --noEmit 2>&1 || true)
 if echo "$TSC" | grep -q "error TS"; then
-  warn "Type errors found — review before deploying"
+  warn "Type errors present — review before deploying:"
   echo "$TSC" | grep "error TS" | head -10
 else
   ok "Type check passed"
@@ -124,19 +150,15 @@ fi
 # Done
 echo ""
 echo -e "${Y}  ══════════════════════════════════════${B}"
-echo -e "${Y}  ✦ Done. Two things left:${B}"
+echo -e "${Y}  ✦ Integration done.${B}"
 echo ""
-echo -e "  ${G}1. Restart server:${B}"
-echo "     cd $MC && npm run dev"
-echo "     (or: pm2 restart all)"
+echo -e "  ${G}Restart server:${B}  cd $MC && npm run dev"
 echo ""
-echo -e "  ${G}2. Add to sidebar (layout.tsx):${B}"
+echo -e "  ${G}Add to sidebar (layout.tsx or nav component):${B}"
 echo '     <NavLink href="/app/s/dashboard">Dashboard</NavLink>'
 echo '     <NavLink href="/app/s/today">Today</NavLink>'
 echo '     <NavLink href="/app/s/tasks">Tasks</NavLink>'
 echo '     <NavLink href="/app/s/goals">Goals</NavLink>'
 echo '     <NavLink href="/app/s/brain-dump">Brain Dump</NavLink>'
 echo '     <NavLink href="/app/s/inbox">Inbox</NavLink>'
-echo ""
-echo -e "  ${DIM}Open: http://localhost:3002/app/s/dashboard${B}"
 echo ""
